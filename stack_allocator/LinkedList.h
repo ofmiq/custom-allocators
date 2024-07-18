@@ -12,14 +12,11 @@ class LinkedList {
     Node* next;
   };
 
-  using allocator_type = typename AllocatorTraits<
-      typename Alloc::template rebind<Node>::other>::allocator_type;
-  using value_type = typename AllocatorTraits<
-      typename Alloc::template rebind<Node>::other>::value_type;
-  using pointer = typename AllocatorTraits<
-      typename Alloc::template rebind<Node>::other>::pointer;
-  using size_type = typename AllocatorTraits<
-      typename Alloc::template rebind<Node>::other>::size_type;
+  using allocator_type =
+      typename std::allocator_traits<Alloc>::template rebind_alloc<Node>;
+  using value_type = typename std::allocator_traits<allocator_type>::value_type;
+  using pointer = typename std::allocator_traits<allocator_type>::pointer;
+  using size_type = typename std::allocator_traits<allocator_type>::size_type;
 
   LinkedList() : head_(nullptr) {}
 
@@ -27,7 +24,8 @@ class LinkedList {
 
   void push_front(const T& value) {
     pointer new_node = allocator_.allocate(1);
-    allocator_.construct(new_node, Node{value, head_});
+    AllocatorTraits<allocator_type>::construct(allocator_, new_node,
+                                               Node{value, head_});
     head_ = new_node;
   }
 
@@ -35,7 +33,7 @@ class LinkedList {
     if (head_) {
       pointer temp = head_;
       head_ = head_->next;
-      allocator_.destroy(temp);
+      AllocatorTraits<allocator_type>::destroy(allocator_, temp);
       allocator_.deallocate(temp, 1);
     }
   }
@@ -72,7 +70,7 @@ class LinkedList {
 
  private:
   Node* head_;
-  typename Alloc::template rebind<Node>::other allocator_;
+  allocator_type allocator_;
 };
 
 #endif  // LINKED_LIST_H

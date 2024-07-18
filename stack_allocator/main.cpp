@@ -78,7 +78,6 @@ void benchmark_list(ListType& list, int num_elements) {
 }
 
 int main() {
-
   std::cout << "Testing StackAllocator..." << '\n';
   test_stack_allocator();
 
